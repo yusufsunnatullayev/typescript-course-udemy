@@ -25,3 +25,6 @@ const logTodo = (id: number, title: string, completed: boolean) => {
      Is it fineshed? ${completed}
     `);
 };
+
+// TYPE ANNOTATION - we (developers) tell to typescript what the type is 🚩
+// TYPE INFERENCE - typescript itself guess what the type is 🚩
