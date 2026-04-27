@@ -207,7 +207,7 @@
       });
     }
   }
-})({"MS1P0":[function(require,module,exports,__globalThis) {
+})({"1IIxJ":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
@@ -721,74 +721,10 @@ var _customMap = require("./CustomMap");
 const user = new (0, _user.User)();
 const company = new (0, _company.Company)();
 const customMap = new (0, _customMap.CustomMap)("map");
-customMap.addUserMarker(user);
-customMap.addCompanyMarker(company);
+customMap.addMarker(user);
+customMap.addMarker(company);
 
-},{"./CustomMap":"eQj57","./User":"6FuE9","./Company":"lp8cZ"}],"eQj57":[function(require,module,exports,__globalThis) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "CustomMap", ()=>CustomMap);
-class CustomMap {
-    constructor(divId){
-        this.googleMap = new google.maps.Map(document.getElementById(divId), {
-            zoom: 1,
-            center: {
-                lat: 0,
-                lng: 0
-            }
-        });
-    }
-    addUserMarker(user) {
-        new google.maps.Marker({
-            map: this.googleMap,
-            position: {
-                lat: user.location.lat,
-                lng: user.location.lng
-            }
-        });
-    }
-    addCompanyMarker(company) {
-        new google.maps.Marker({
-            map: this.googleMap,
-            position: {
-                lat: company.location.lat,
-                lng: company.location.lng
-            }
-        });
-    }
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"0jL2E"}],"0jL2E":[function(require,module,exports,__globalThis) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"6FuE9":[function(require,module,exports,__globalThis) {
+},{"./User":"6FuE9","./Company":"lp8cZ","./CustomMap":"eQj57"}],"6FuE9":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "User", ()=>User);
@@ -804,7 +740,7 @@ class User {
     }
 }
 
-},{"faker":"46STV","@parcel/transformer-js/src/esmodule-helpers.js":"0jL2E"}],"46STV":[function(require,module,exports,__globalThis) {
+},{"faker":"46STV","@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}],"46STV":[function(require,module,exports,__globalThis) {
 // since we are requiring the top level of faker, load all locales by default
 var Faker = require("680127a713cf9261");
 var faker = new Faker({
@@ -87622,6 +87558,36 @@ module["exports"] = [
     "09##-######"
 ];
 
+},{}],"9vpc5":[function(require,module,exports,__globalThis) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, '__esModule', {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
 },{}],"lp8cZ":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -87639,6 +87605,38 @@ class Company {
     }
 }
 
-},{"faker":"46STV","@parcel/transformer-js/src/esmodule-helpers.js":"0jL2E"}]},["MS1P0","gH3Lb"], "gH3Lb", "parcelRequire57d4", {})
+},{"faker":"46STV","@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}],"eQj57":[function(require,module,exports,__globalThis) {
+// Instruction to every other class on how they can be an argument to 'addMarker'
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "CustomMap", ()=>CustomMap);
+class CustomMap {
+    constructor(divId){
+        this.googleMap = new google.maps.Map(document.getElementById(divId), {
+            zoom: 1,
+            center: {
+                lat: 0,
+                lng: 0
+            }
+        });
+    }
+    addMarker(mappable) {
+        const marker = new google.maps.Marker({
+            map: this.googleMap,
+            position: {
+                lat: mappable.location.lat,
+                lng: mappable.location.lng
+            }
+        });
+        marker.addListener("click", ()=>{
+            const infoWindow = new google.maps.InfoWindow({
+                content: "Hi there"
+            });
+            infoWindow.open(this.googleMap, marker);
+        });
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}]},["1IIxJ","gH3Lb"], "gH3Lb", "parcelRequire57d4", {})
 
 //# sourceMappingURL=maps.34df32e0.js.map
