@@ -1,21 +1,22 @@
-class Sorter {
-  constructor(public collection: number[]) {}
+import { CharactersCollection } from "./CharactersCollection";
+import { LinkedList } from "./LinkedList";
+import { NumbersCollection } from "./NumbersCollection";
 
-  sort(): void {
-    const { length } = this.collection;
+// Number Sort🚩
+const numbersCollection = new NumbersCollection([10, -2, 23, 5, -7, 45]);
+numbersCollection.sort();
+console.log(numbersCollection.data);
 
-    for (let i = 0; i < length; i++) {
-      for (let j = 0; j < length - i - 1; j++) {
-        if (this.collection[j]! > this.collection[j + 1]!) {
-          const leftHand = this.collection[j]!;
-          this.collection[j] = this.collection[j + 1]!;
-          this.collection[j + 1] = leftHand;
-        }
-      }
-    }
-  }
-}
+// String Sort🚩
+const characsCollection = new CharactersCollection("Yusuf Sunnatullayev");
+characsCollection.sort();
+console.log(characsCollection.data);
 
-const sorter = new Sorter([10, 3, -5, 0]);
-sorter.sort();
-console.log(sorter.collection);
+// LinkedList Sort🚩
+const linkedList = new LinkedList();
+linkedList.add(500);
+linkedList.add(-10);
+linkedList.add(-3);
+linkedList.add(4);
+linkedList.sort();
+console.log(linkedList.print());
