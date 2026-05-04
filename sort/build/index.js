@@ -1,24 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class Sorter {
-    collection;
-    constructor(collection) {
-        this.collection = collection;
-    }
-    sort() {
-        const { length } = this.collection;
-        for (let i = 0; i < length; i++) {
-            for (let j = 0; j < length - i - 1; j++) {
-                if (this.collection[j] > this.collection[j + 1]) {
-                    const leftHand = this.collection[j];
-                    this.collection[j] = this.collection[j + 1];
-                    this.collection[j + 1] = leftHand;
-                }
-            }
-        }
-    }
-}
-const sorter = new Sorter([10, 3, -5, 0]);
-sorter.sort();
-console.log(sorter.collection);
+const CharactersCollection_1 = require("./CharactersCollection");
+const LinkedList_1 = require("./LinkedList");
+const NumbersCollection_1 = require("./NumbersCollection");
+// Number Sort🚩
+const numbersCollection = new NumbersCollection_1.NumbersCollection([10, -2, 23, 5, -7, 45]);
+numbersCollection.sort();
+console.log(numbersCollection.data);
+// String Sort🚩
+const characsCollection = new CharactersCollection_1.CharactersCollection("Yusuf Sunnatullayev");
+characsCollection.sort();
+console.log(characsCollection.data);
+// LinkedList Sort🚩
+const linkedList = new LinkedList_1.LinkedList();
+linkedList.add(500);
+linkedList.add(-10);
+linkedList.add(-3);
+linkedList.add(4);
+linkedList.sort();
+console.log(linkedList.print());
 //# sourceMappingURL=index.js.map
