@@ -3,5 +3,9 @@ export const dateStringToDate = (dateString: string): Date => {
     return parseInt(value);
   });
 
-  return new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+  return new Date(
+    dateParts[2] as number,
+    (dateParts[1] as number) - 1,
+    dateParts[0],
+  );
 };
