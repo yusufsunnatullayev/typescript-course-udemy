@@ -1,3 +1,5 @@
+import { CsvFileReader } from "./CsvFileReader";
+import { MatchData } from "./MatchData";
 import { MatchResult } from "./MatchResult";
 import { dateStringToDate } from "./utils";
 
@@ -6,9 +8,11 @@ interface DataReader {
   data: string[][];
 }
 
-type MatchData = [Date, string, string, number, number, MatchResult, string];
-
 export class MatchReader {
+  static fromCsv(filename: string): MatchReader {
+    return new MatchReader(new CsvFileReader(filename));
+  }
+
   matches: MatchData[] = [];
 
   constructor(public reader: DataReader) {}

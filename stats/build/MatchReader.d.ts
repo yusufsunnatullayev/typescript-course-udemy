@@ -1,11 +1,11 @@
-import { MatchResult } from "./MatchResult";
+import { MatchData } from "./MatchData";
 interface DataReader {
     read(): void;
     data: string[][];
 }
-type MatchData = [Date, string, string, number, number, MatchResult, string];
 export declare class MatchReader {
     reader: DataReader;
+    static fromCsv(filename: string): MatchReader;
     matches: MatchData[];
     constructor(reader: DataReader);
     load(): void;
