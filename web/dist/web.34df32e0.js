@@ -715,60 +715,30 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 
 },{}],"gH3Lb":[function(require,module,exports,__globalThis) {
 var _user = require("./models/User");
-const user = new (0, _user.User)({
-    id: 1,
-    name: "John Doe",
-    age: 100
+const user = (0, _user.User).buildUser({
+    id: 1
 });
-user.on("save", ()=>{
+user.on("change", ()=>{
     console.log(user);
 });
-user.save();
+user.fetch();
 
 },{"./models/User":"hjS3N"}],"hjS3N":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "User", ()=>User);
+var _apiSync = require("./ApiSync");
 var _attributes = require("./Attributes");
 var _eventing = require("./Eventing");
-var _sync = require("./Sync");
+var _model = require("./Model");
 const rootUrl = "http://localhost:3000/users";
-class User {
-    constructor(attrs){
-        this.events = new (0, _eventing.Eventing)();
-        this.sync = new (0, _sync.Sync)(rootUrl);
-        this.attributes = new (0, _attributes.Attributes)(attrs);
-    }
-    get on() {
-        return this.events.on;
-    }
-    get trigger() {
-        return this.events.trigger;
-    }
-    get get() {
-        return this.attributes.get;
-    }
-    set(update) {
-        this.attributes.set(update);
-        this.events.trigger("change");
-    }
-    fetch() {
-        const id = this.attributes.get("id");
-        if (typeof id !== "number") throw new Error("Cannot fetch without an id");
-        this.sync.fetch(id).then((response)=>{
-            this.set(response.data);
-        });
-    }
-    save() {
-        this.sync.save(this.attributes.getAll()).then((response)=>{
-            this.trigger("save");
-        }).catch(()=>{
-            this.trigger("error");
-        });
+class User extends (0, _model.Model) {
+    static buildUser(attrs) {
+        return new User(new (0, _attributes.Attributes)(attrs), new (0, _eventing.Eventing)(), new (0, _apiSync.ApiSync)(rootUrl));
     }
 }
 
-},{"./Attributes":"cDuwM","./Eventing":"eBJmf","./Sync":"f5dN4","@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}],"cDuwM":[function(require,module,exports,__globalThis) {
+},{"./Attributes":"cDuwM","./Eventing":"eBJmf","@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5","./ApiSync":"cZ7c5","./Model":"khZhq"}],"cDuwM":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Attributes", ()=>Attributes);
@@ -839,13 +809,13 @@ class Eventing {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}],"f5dN4":[function(require,module,exports,__globalThis) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}],"cZ7c5":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Sync", ()=>Sync);
+parcelHelpers.export(exports, "ApiSync", ()=>ApiSync);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
-class Sync {
+class ApiSync {
     constructor(rootUrl){
         this.rootUrl = rootUrl;
     }
@@ -6177,6 +6147,45 @@ Object.entries(HttpStatusCode).forEach(([key, value])=>{
     HttpStatusCode[value] = key;
 });
 exports.default = HttpStatusCode;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}],"khZhq":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Model", ()=>Model);
+class Model {
+    constructor(attributes, events, sync){
+        this.attributes = attributes;
+        this.events = events;
+        this.sync = sync;
+    }
+    get on() {
+        return this.events.on;
+    }
+    get trigger() {
+        return this.events.trigger;
+    }
+    get get() {
+        return this.attributes.get;
+    }
+    set(update) {
+        this.attributes.set(update);
+        this.events.trigger("change");
+    }
+    fetch() {
+        const id = this.attributes.get("id");
+        if (typeof id !== "number") throw new Error("Cannot fetch without an id");
+        this.sync.fetch(id).then((response)=>{
+            this.set(response.data);
+        });
+    }
+    save() {
+        this.sync.save(this.attributes.getAll()).then((response)=>{
+            this.trigger("save");
+        }).catch(()=>{
+            this.trigger("error");
+        });
+    }
+}
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"9vpc5"}]},["1IIxJ","gH3Lb"], "gH3Lb", "parcelRequire94c2", {})
 
