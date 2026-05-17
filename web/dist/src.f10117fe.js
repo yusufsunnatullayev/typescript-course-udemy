@@ -6763,7 +6763,7 @@ exports.isCancel = isCancel;
 exports.CanceledError = CanceledError;
 exports.AxiosError = AxiosError;
 exports.Axios = Axios;
-},{"./lib/axios.js":"node_modules/axios/lib/axios.js"}],"src/models/User.ts":[function(require,module,exports) {
+},{"./lib/axios.js":"node_modules/axios/lib/axios.js"}],"src/models/ApiSync.ts":[function(require,module,exports) {
 "use strict";
 
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
@@ -6777,60 +6777,284 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.User = void 0;
+exports.ApiSync = void 0;
 const axios_1 = __importDefault(require("axios"));
-class User {
+class ApiSync {
+  constructor(rootUrl) {
+    _defineProperty(this, "rootUrl", void 0);
+    this.rootUrl = rootUrl;
+  }
+  fetch(id) {
+    return axios_1.default.get("".concat(this.rootUrl, "/").concat(id));
+  }
+  save(data) {
+    const id = data.id;
+    if (id) {
+      return axios_1.default.put("".concat(this.rootUrl, "/").concat(id), data);
+    } else {
+      return axios_1.default.post(this.rootUrl, data);
+    }
+  }
+}
+exports.ApiSync = ApiSync;
+},{"axios":"node_modules/axios/index.js"}],"src/models/Attributes.ts":[function(require,module,exports) {
+"use strict";
+
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Attributes = void 0;
+class Attributes {
   constructor(data) {
     _defineProperty(this, "data", void 0);
-    _defineProperty(this, "events", {});
+    _defineProperty(this, "get", key => {
+      return this.data[key];
+    });
     this.data = data;
-  }
-  get(propName) {
-    return this.data[propName];
   }
   set(update) {
     Object.assign(this.data, update);
   }
-  on(eventName, callback) {
-    const handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
+  getAll() {
+    return this.data;
   }
-  trigger(eventName) {
-    const handlers = this.events[eventName];
-    if (!handlers || handlers.length === 0) return;
-    handlers.forEach(callback => {
-      callback();
+}
+exports.Attributes = Attributes;
+},{}],"src/models/Eventing.ts":[function(require,module,exports) {
+"use strict";
+
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Eventing = void 0;
+class Eventing {
+  constructor() {
+    _defineProperty(this, "events", {});
+    _defineProperty(this, "on", (eventName, callback) => {
+      const handlers = this.events[eventName] || [];
+      handlers.push(callback);
+      this.events[eventName] = handlers;
+    });
+    _defineProperty(this, "trigger", eventName => {
+      const handlers = this.events[eventName];
+      if (!handlers || handlers.length === 0) return;
+      handlers.forEach(callback => {
+        callback();
+      });
     });
   }
+}
+exports.Eventing = Eventing;
+},{}],"src/models/Collection.ts":[function(require,module,exports) {
+"use strict";
+
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Collection = void 0;
+const axios_1 = __importDefault(require("axios"));
+const Eventing_1 = require("./Eventing");
+class Collection {
+  constructor(rootUrl, deserialize) {
+    _defineProperty(this, "rootUrl", void 0);
+    _defineProperty(this, "deserialize", void 0);
+    _defineProperty(this, "models", []);
+    _defineProperty(this, "events", new Eventing_1.Eventing());
+    this.rootUrl = rootUrl;
+    this.deserialize = deserialize;
+  }
+  get on() {
+    return this.events.on;
+  }
+  get trigger() {
+    return this.events.trigger;
+  }
   fetch() {
-    axios_1.default.get("http://localhost:3000/users/".concat(this.get("id"))).then(response => {
+    axios_1.default.get(this.rootUrl).then(response => {
+      response.data.forEach(value => {
+        this.models.push(this.deserialize(value));
+      });
+      this.trigger("change");
+    });
+  }
+}
+exports.Collection = Collection;
+},{"axios":"node_modules/axios/index.js","./Eventing":"src/models/Eventing.ts"}],"src/models/Model.ts":[function(require,module,exports) {
+"use strict";
+
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Model = void 0;
+class Model {
+  constructor(attributes, events, sync) {
+    _defineProperty(this, "attributes", void 0);
+    _defineProperty(this, "events", void 0);
+    _defineProperty(this, "sync", void 0);
+    this.attributes = attributes;
+    this.events = events;
+    this.sync = sync;
+  }
+  get on() {
+    return this.events.on;
+  }
+  get trigger() {
+    return this.events.trigger;
+  }
+  get get() {
+    return this.attributes.get;
+  }
+  set(update) {
+    this.attributes.set(update);
+    this.events.trigger("change");
+  }
+  fetch() {
+    const id = this.attributes.get("id");
+    if (typeof id !== "number") {
+      throw new Error("Cannot fetch without an id");
+    }
+    this.sync.fetch(id).then(response => {
       this.set(response.data);
     });
   }
   save() {
-    const id = this.get("id");
-    if (id) {
-      axios_1.default.put("http://localhost:3000/users/".concat(id), this.data);
-    } else {
-      axios_1.default.post("http://localhost:3000/users", this.data);
-    }
+    this.sync.save(this.attributes.getAll()).then(response => {
+      this.trigger("save");
+    }).catch(() => {
+      this.trigger("error");
+    });
+  }
+}
+exports.Model = Model;
+},{}],"src/models/User.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.User = void 0;
+const ApiSync_1 = require("./ApiSync");
+const Attributes_1 = require("./Attributes");
+const Collection_1 = require("./Collection");
+const Eventing_1 = require("./Eventing");
+const Model_1 = require("./Model");
+const rootUrl = "http://localhost:3000/users";
+class User extends Model_1.Model {
+  static buildUser(attrs) {
+    return new User(new Attributes_1.Attributes(attrs), new Eventing_1.Eventing(), new ApiSync_1.ApiSync(rootUrl));
+  }
+  static buildUserCollection() {
+    return new Collection_1.Collection(rootUrl, json => User.buildUser(json));
+  }
+  setRandomAge() {
+    const age = Math.round(Math.random() * 100);
+    this.set({
+      age
+    });
   }
 }
 exports.User = User;
-},{"axios":"node_modules/axios/index.js"}],"src/index.ts":[function(require,module,exports) {
+},{"./ApiSync":"src/models/ApiSync.ts","./Attributes":"src/models/Attributes.ts","./Collection":"src/models/Collection.ts","./Eventing":"src/models/Eventing.ts","./Model":"src/models/Model.ts"}],"src/views/UserForm.ts":[function(require,module,exports) {
+"use strict";
+
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.UserForm = void 0;
+class UserForm {
+  constructor(parent, model) {
+    _defineProperty(this, "parent", void 0);
+    _defineProperty(this, "model", void 0);
+    _defineProperty(this, "onSetAgeClick", () => {
+      this.model.setRandomAge();
+    });
+    _defineProperty(this, "onSetNameClick", () => {
+      const input = this.parent.querySelector("input");
+      const name = input === null || input === void 0 ? void 0 : input.value;
+      this, this.model.set({
+        name
+      });
+    });
+    this.parent = parent;
+    this.model = model;
+    this.bindModel();
+  }
+  bindModel() {
+    this.model.on("change", () => {
+      this.render();
+    });
+  }
+  eventsMap() {
+    return {
+      "click:.set-age": this.onSetAgeClick,
+      "click:.set-name": this.onSetNameClick
+    };
+  }
+  template() {
+    return "\n     <div>\n       <h1>User Form</h1>\n       <div>User name ".concat(this.model.get("name"), "</div>\n       <div>User age ").concat(this.model.get("age"), "</div>\n       <input />\n       <button class='set-name'>Chane name</button>\n       <button class='set-age'>Set Random Age</button>\n     </div>\n    ");
+  }
+  bindEvents(fragment) {
+    const eventsMap = this.eventsMap();
+    for (let key in eventsMap) {
+      const _key$split = key.split(":"),
+        _key$split2 = _slicedToArray(_key$split, 2),
+        eventName = _key$split2[0],
+        selector = _key$split2[1];
+      fragment.querySelectorAll(selector).forEach(element => {
+        element.addEventListener(eventName, eventsMap[key]);
+      });
+    }
+  }
+  render() {
+    this.parent.innerHTML = "";
+    const templateElement = document.createElement("template");
+    templateElement.innerHTML = this.template();
+    this.bindEvents(templateElement.content);
+    this.parent.append(templateElement.content);
+  }
+}
+exports.UserForm = UserForm;
+},{}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 const User_1 = require("./models/User");
-const user = new User_1.User({
-  name: "New name",
-  age: 0
+const UserForm_1 = require("./views/UserForm");
+const user = User_1.User.buildUser({
+  name: "Me",
+  age: 20
 });
-user.save();
-},{"./models/User":"src/models/User.ts"}],"C:/Users/User/AppData/Local/nvm/v22.21.1/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+const userForm = new UserForm_1.UserForm(document.getElementById("root"), user);
+userForm.render();
+},{"./models/User":"src/models/User.ts","./views/UserForm":"src/views/UserForm.ts"}],"C:/Users/User/AppData/Local/nvm/v22.21.1/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -6855,7 +7079,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50523" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64090" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
