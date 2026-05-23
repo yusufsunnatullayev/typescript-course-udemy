@@ -1,0 +1,1 @@
+{"version":3,"file":"bodyValidator.d.ts","sourceRoot":"","sources":["../../../src/controllers/decorators/bodyValidator.ts"],"names":[],"mappings":"AAAA,OAAO,kBAAkB,CAAC;AAG1B,wBAAgB,aAAa,CAAC,GAAG,IAAI,EAAE,MAAM,EAAE,IAC5B,QAAQ,GAAG,EAAE,KAAK,MAAM,EAAE,MAAM,kBAAkB,UAGpE"}
